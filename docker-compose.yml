@@ -1,0 +1,46 @@
+version: '3'
+services:
+  postgres_db:
+    image: postgres:12-alpine
+    ports:
+      - 5432:5432
+    networks:
+      - internal
+    environment:
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=clinic_user
+      - POSTGRES_DB=postgres
+    volumes:
+      - ${PWD}/local/postgres:/var/lib/postgresql/data
+  keycloak:
+    container_name: dev-keycloak
+    image: coopersoft/keycloak:21.0.2_phone-2.3.4-snapshot
+    command:
+      - start-dev
+      - --spi-phone-default-service=dummy
+      - --spi-phone-default-gobacsi-phone-default-region=VN
+      - --spi-phone-default-token-expires-in=300
+      - --spi-phone-default-source-hour-maximum=100
+      - --spi-phone-default-target-hour-maximum=3
+    networks:
+      - internal
+    environment:
+      - KEYCLOAK_ADMIN=kc-admin
+      - KEYCLOAK_ADMIN_PASSWORD=Tech@554
+      - KC_DB=postgres
+      - KC_HOSTNAME=localhost
+      - KC_DB_PORT=5432
+      - KC_DB_SCHEMA=keycloak
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_URL=jdbc:postgresql://postgres_db:5432/keycloak
+      - KC_DB_URL_HOST=postgres_db
+      - KC_DB_USERNAME=clinic_user
+      - KC_DB_PASSWORD=123456
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres_db
+networks:
+  internal:
