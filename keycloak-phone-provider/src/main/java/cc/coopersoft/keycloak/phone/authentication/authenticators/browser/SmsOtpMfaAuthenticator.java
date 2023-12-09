@@ -8,6 +8,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.HttpResponse;
@@ -130,11 +131,11 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
 
     PhoneProvider phoneProvider = context.getSession().getProvider(PhoneProvider.class);
     try {
-      int expires = phoneProvider.sendTokenCode(phoneNumber,context.getConnection().getRemoteAddr(),
+      TokenCodeRepresentation expires = phoneProvider.sendTokenCode(phoneNumber,context.getConnection().getRemoteAddr(),
           TokenCodeType.OTP, null);
       context.form()
           .setInfo("codeSent", phoneNumber)
-          .setAttribute("expires", expires)
+          .setAttribute("expires", expires.getExpiresAt().getTime())
           .setAttribute("initSend",true);
     } catch (ForbiddenException e) {
       logger.warn("otp send code Forbidden Exception!", e);

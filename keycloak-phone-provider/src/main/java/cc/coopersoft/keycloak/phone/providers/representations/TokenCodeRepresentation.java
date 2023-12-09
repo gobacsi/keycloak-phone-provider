@@ -7,6 +7,7 @@ import org.keycloak.models.utils.KeycloakModelUtils;
 
 import java.security.SecureRandom;
 import java.util.Date;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +21,10 @@ public class TokenCodeRepresentation {
     private Date createdAt;
     private Date expiresAt;
     private Boolean confirmed;
+
+    public int getExpiresIn() {
+      return (int) (this.getExpiresAt().getTime() - Instant.now().toEpochMilli()) / 1000;
+    }
 
     public static TokenCodeRepresentation forPhoneNumber(String phoneNumber) {
 

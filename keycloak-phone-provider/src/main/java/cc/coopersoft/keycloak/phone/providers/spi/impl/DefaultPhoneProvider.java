@@ -115,7 +115,7 @@ public class DefaultPhoneProvider implements PhoneProvider {
     }
 
     @Override
-    public int sendTokenCode(String phoneNumber,String sourceAddr,TokenCodeType type, String kind){
+    public TokenCodeRepresentation sendTokenCode(String phoneNumber,String sourceAddr,TokenCodeType type, String kind){
 
         logger.info("send code to:" + phoneNumber );
 
@@ -126,7 +126,8 @@ public class DefaultPhoneProvider implements PhoneProvider {
         TokenCodeRepresentation ongoing = getTokenCodeService().ongoingProcess(phoneNumber, type);
         if (ongoing != null) {
             logger.info(String.format("No need of sending a new %s code for %s",type.label, phoneNumber));
-            return (int) (ongoing.getExpiresAt().getTime() - Instant.now().toEpochMilli()) / 1000;
+            // return (int) (ongoing.getExpiresAt().getTime() - Instant.now().toEpochMilli()) / 1000;
+            return ongoing;
         }
 
         TokenCodeRepresentation token = TokenCodeRepresentation.forPhoneNumber(phoneNumber);
@@ -144,7 +145,8 @@ public class DefaultPhoneProvider implements PhoneProvider {
             throw new ServiceUnavailableException("Internal server error");
         }
 
-        return tokenExpiresIn;
+        // return tokenExpiresIn;
+        return token;
     }
 
 }
